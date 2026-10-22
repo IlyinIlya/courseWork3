@@ -1,5 +1,8 @@
 package pro.sky.telegrambot.schedulers;
 
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,11 +21,14 @@ public class NotificationTaskScheduler {
             LoggerFactory.getLogger(NotificationTaskScheduler.class);
 
     private final NotificationTaskRepository repository;
+    private final TelegramBot telegramBot;
 
     public NotificationTaskScheduler(
-            NotificationTaskRepository repository
+            NotificationTaskRepository repository,
+            TelegramBot telegramBot
     ) {
         this.repository = repository;
+        this.telegramBot = telegramBot;
     }
 
     @Scheduled(cron = "0 * * * * *")
@@ -38,5 +44,29 @@ public class NotificationTaskScheduler {
                 currentMinute,
                 tasks.size()
         );
+
+        for (NotificationTask task : tasks) {
+            SendMessage message = new SendMessage(
+                    task.getChatId(),
+                    task.getMessage()
+            );
+
+            SendResponse response = telegramBot.execute(message);
+
+            if (response.isOk()) {
+                logger.info(
+                        "Уведомление отправлено: id={}, chatId={}",
+                        task.getId(),
+                        task.getChatId()
+                );
+            } else {
+                logger.error(
+                        "Не удалось отправить уведомление: id={}, chatId={}, errorCode={}",
+                        task.getId(),
+                        task.getChatId(),
+                        response.errorCode()
+                );
+            }
+        }
     }
 }
