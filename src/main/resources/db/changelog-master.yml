@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - include:
+      file: changesets/create-index-student-name.yml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changesets/create-index-faculty-name-color.yml
+      relativeToChangelogFile: true
+
+  - include:
+      file: changesets/create-notification-task.yml
+      relativeToChangelogFile: true
