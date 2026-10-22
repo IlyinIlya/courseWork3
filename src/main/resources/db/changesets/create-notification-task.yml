@@ -28,6 +28,6 @@ databaseChangeLog:
 
               - column:
                   name: notification_time
-                  type: TIMESTAMP WITH TIME ZONE
+                  type: TIMESTAMP
                   constraints:
                     nullable: false
